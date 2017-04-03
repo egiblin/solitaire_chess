@@ -115,13 +115,10 @@ end
 possible_solves = pieces.permutation(pieces.length).to_a
 possible_solves_master = possible_solves
 possible_solves.each_with_index do |piece_array, index|
-  puts "Solution #{index + 1}"
   piece_array.each_with_index do |piece, index|
-    puts "Move #{index + 1}"
     if piece_array[-1] != piece
       if piece_array.include?(piece) && piece.move([(piece_array[index + 1]).column, (piece_array[index + 1]).row])
         captured_piece = piece_array[index + 1]
-        binding.pry
         piece_array = piece_array.map do |x|
           if x == captured_piece
             piece
