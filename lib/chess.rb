@@ -130,6 +130,9 @@ possible_solves.each_with_index do |piece_array, index|
     end
   end
 end
+
+
+
 solve_counter = 0
 solve_array_keys = []
 solutions = []
