@@ -6,6 +6,7 @@ require_relative 'pawn'
 require_relative 'piece'
 require_relative 'queen'
 require_relative 'rook'
+require_relative 'chess_board'
 require 'pry'
 
 #initialize boards
@@ -40,69 +41,74 @@ puts "After row, give the square, with 1 being on the left and 4 on the right."
 puts "Finally, give the piece type."
 board_input = true
 while board_input do
+  chess_board(board, pieces)
   puts "Would you like to add a piece? (Y/N)"
   new_piece = gets.chomp
   if new_piece.downcase == 'y'
     puts "On which row would you like to place the piece? (1-4)"
     row = gets.chomp.to_i
-    if (1..4) === row
-      puts "On what which square would you like to place the piece? (1-4)"
+    while row.between?(1,4) == false
+      puts "That is not a valid input. Please input an integer between 1 and 4"
+      row = gets.chomp.to_i
+    end
+    puts "On what which square would you like to place the piece? (1-4)"
+    column = gets.chomp.to_i
+    while column.between?(1,4) == false
+      puts "That is not a valid input. Please input an integer between 1 and 4"
       column = gets.chomp.to_i
-      if (1..4) === column
-        selected_square = board.find  { |s| s.column == column and s.row == row}
-
-        if selected_square.occupied == true
-          puts "Unfortunately that square is currently occupied. Would you like to overwrite?"
-          overwrite = gets.chomp.downcase
-          if overwrite == 'y'
-            deleted_piece = [pieces.find { |s| s.column == column and s.row == row }]
-            pieces = pieces - deleted_piece
-            puts "What type of piece is this? (K/Q/B/N/R/P)"
-            piece = gets.chomp.upcase
-            if ["K", "Q", "B", "N", "R", "P"].include?(piece)
-              if piece == "K"
-                pieces.push(King.new([column, row]))
-              elsif piece == "Q"
-                pieces.push(Queen.new([column, row]))
-              elsif piece == "B"
-                pieces.push(Bishop.new([column, row]))
-              elsif piece == "N"
-                pieces.push(Knight.new([column, row]))
-              elsif piece == "Rook"
-                pieces.push(Rook.new([column, row]))
-              else
-                pieces.push(Pawn.new([column, row]))
-              end
-            end
-          end
-        else
-          puts "What type of piece is this? (K/Q/B/N/R/P)"
+    end
+    selected_square = board.find  { |s| s.column == column and s.row == row}
+    if selected_square.occupied == true
+      puts "Unfortunately that square is currently occupied. Would you like to overwrite?"
+      overwrite = gets.chomp.downcase
+      while overwrite != 'y' && overwrite != 'n'
+        puts "That is not a valid input. Please put 'y' or 'n'"
+        overwrite = gets.chomp.downcase
+      end
+      if overwrite == 'y'
+        deleted_piece = [pieces.find { |s| s.column == column and s.row == row }]
+        pieces = pieces - deleted_piece
+        puts "What type of piece is this? (K/Q/B/N/R/P)"
+        piece = gets.chomp.upcase
+        while ["K", "Q", "B", "N", "R", "P"].include?(piece) == false
+          puts "That is not a valid piece. Please enter one of (K/Q/B/N/R/P)"
           piece = gets.chomp.upcase
-
-          selected_square.occupied = true
-          if ["K", "Q", "B", "N", "R", "P"].include?(piece)
-            if piece == "K"
-              pieces.push(King.new([column, row]))
-            elsif piece == "Q"
-              pieces.push(Queen.new([column, row]))
-            elsif piece == "B"
-              pieces.push(Bishop.new([column, row]))
-            elsif piece == "N"
-              pieces.push(Knight.new([column, row]))
-            elsif piece == "R"
-              pieces.push(Rook.new([column, row]))
-            else
-              pieces.push(Pawn.new([column, row]))
-            end
-          else
-            puts "That is not a valid input. Please input one of K, Q, B, N, R, P"
-          end
         end
-      else
-        puts "That is not a valid input. Please input an integer between 1 and 4"
+        if piece == "K"
+          pieces.push(King.new([column, row]))
+        elsif piece == "Q"
+          pieces.push(Queen.new([column, row]))
+        elsif piece == "B"
+          pieces.push(Bishop.new([column, row]))
+        elsif piece == "N"
+          pieces.push(Knight.new([column, row]))
+        elsif piece == "Rook"
+          pieces.push(Rook.new([column, row]))
+        else
+          pieces.push(Pawn.new([column, row]))
+        end
       end
     else
-      puts "That is not a valid input. Please input an integer between 1 and 4"
+      selected_square.occupied = true
+      puts "What type of piece is this? (K/Q/B/N/R/P)"
+      piece = gets.chomp.upcase
+      while ["K", "Q", "B", "N", "R", "P"].include?(piece) == false
+        puts "That is not a valid piece. Please enter one of (K/Q/B/N/R/P)"
+        piece = gets.chomp.upcase
+      end
+      if piece == "K"
+        pieces.push(King.new([column, row]))
+      elsif piece == "Q"
+        pieces.push(Queen.new([column, row]))
+      elsif piece == "B"
+        pieces.push(Bishop.new([column, row]))
+      elsif piece == "N"
+        pieces.push(Knight.new([column, row]))
+      elsif piece == "Rook"
+        pieces.push(Rook.new([column, row]))
+      else
+        pieces.push(Pawn.new([column, row]))
+      end
     end
   elsif new_piece.downcase == "n"
     board_input = false
@@ -111,37 +117,41 @@ while board_input do
   end
 end
 
-#App checks whether or not the board is solvable
-possible_solves = pieces.permutation(pieces.length).to_a
-possible_solves_master = possible_solves
-possible_solves.each_with_index do |piece_array, index|
-  piece_array.each_with_index do |piece, index|
-    if piece_array[-1] != piece
-      if piece_array.include?(piece) && piece.move([(piece_array[index + 1]).column, (piece_array[index + 1]).row])
-        captured_piece = piece_array[index + 1]
-        piece_array = piece_array.map do |x|
-          if x == captured_piece
-            piece
-          else
-            x
+#Method to check each permutation of move orders
+def solution_checker(array)
+  if array.length > 1
+    array.each_with_index do |piece, index|
+      if piece != array.last
+        if piece.move([(array[index + 1]).column, (array[index + 1]).row])
+          array[index + 1] = piece
+          array.uniq!{|piece| piece.location}
+          new_arrays = array.permutation(array.length).to_a
+          new_arrays.each do |new_array|
+            solution_checker(new_array)
           end
+        else
+          break
         end
       end
     end
   end
 end
 
-
-
+#App checks whether or not the board is solvable
+possible_solves = pieces.permutation(pieces.length).to_a
+possible_solves.each do |piece_array|
+  solution_checker(piece_array)
+end
 solve_counter = 0
 solve_array_keys = []
 solutions = []
 possible_solves.each_with_index do |piece_array, index|
-  if piece_array[-1] == piece_array[-2]
+  if piece_array.length == 1
     solve_counter = solve_counter + 1
     solve_array_keys.push(index)
   end
 end
+possible_solves_master = pieces.permutation(pieces.length).to_a
 solve_array_keys.each do |key|
   solutions.push(possible_solves_master[key])
 end
@@ -155,9 +165,9 @@ else
   solutions.each do |solution|
     solution.each_with_index do |piece, index|
       unless solution[-1] == piece
-        puts "The #{piece} takes the #{solution[index + 1]} at position #{solution[index + 1].location}."
+        puts "The #{solution.first.class} takes the #{solution[index + 1].class} at position #{solution[index + 1].location}."
       else
-        puts "#{piece} is now the final piece."
+        puts "#{solution.first.class} is now the final piece."
       end
     end
   end
