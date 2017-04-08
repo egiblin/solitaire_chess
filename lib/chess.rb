@@ -137,6 +137,7 @@ def solution_checker(array)
   end
 end
 
+
 #App checks whether or not the board is solvable
 possible_solves = pieces.permutation(pieces.length).to_a
 possible_solves.each do |piece_array|
@@ -160,6 +161,7 @@ if solve_counter == 0 && pieces.length > 1
 elsif pieces.length == 1
   puts "There was only one piece, it is already solved."
 else
+  puts "******************************"
   puts "There are #{solutions.length} solutions to this puzzle."
   puts "******************************"
   solutions.each do |solution|

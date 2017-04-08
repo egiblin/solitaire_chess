@@ -7,4 +7,8 @@ class Piece
     @row = location[1]
   end
 
+  def impedements?(location, board)
+    false
+  end
+
 end
