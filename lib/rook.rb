@@ -59,6 +59,7 @@ class Rook < Piece
         false
       else
         false
+      end
     else
       false
     end

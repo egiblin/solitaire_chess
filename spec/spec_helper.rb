@@ -1,5 +1,6 @@
 require "pry"
 require "rspec"
+require "factory_girl"
 
 require_relative "../lib/bishop"
 require_relative "../lib/king"

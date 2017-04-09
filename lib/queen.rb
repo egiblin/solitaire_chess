@@ -63,6 +63,7 @@ class Queen < Piece
         false
       else
         false
+      end
     elsif (new_column - @column) > 0 && (new_row - @row) > 0
       new_column = new_column + 1
       new_row = new_row + 1

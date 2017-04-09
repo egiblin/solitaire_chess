@@ -120,15 +120,45 @@ end
 #Method to check each permutation of move orders
 def solution_checker(array)
   if array.length > 1
+    internal_board = []
+    column_counter = 1
+    row_counter = 1
+    4.times do
+      4.times do
+        internal_board.push(Square.new([column_counter, row_counter]))
+        column_counter = column_counter + 1
+      end
+      row_counter = row_counter + 1
+      column_counter = 1
+    end
+    array.each do |piece|
+      square = internal_board.find {|s| s.location == piece.location}
+      square.occupied = true
+      square.piece = piece
+    end
     array.each_with_index do |piece, index|
-      if piece != array.last
-        if piece.move([(array[index + 1]).column, (array[index + 1]).row])
-          array[index + 1] = piece
+      if piece != array.last && array.include?(piece)
+        original_square = internal_board.find {|s| s.location == piece.location}
+        blocker = piece.impedements?([(array[index + 1]).column, (array[index + 1]).row], internal_board)
+        if blocker
+          captured_piece = pieces.find {|piece| piece.location == blocker.location}
+          piece.move([blocker.column, blocker.row])
           array.uniq!{|piece| piece.location}
           new_arrays = array.permutation(array.length).to_a
           new_arrays.each do |new_array|
             solution_checker(new_array)
           end
+          original_square.occupied = false
+          original_square.piece = nil
+        elsif piece.move([(array[index + 1]).column, (array[index + 1]).row])
+          captured_piece = array[index + 1]
+          array.uniq!{|piece| piece.location}
+          new_arrays = array.permutation(array.length).to_a
+          new_arrays.each do |new_array|
+            solution_checker(new_array)
+          end
+          original_square.occupied = false
+          original_square.piece = nil
         else
           break
         end
@@ -153,6 +183,7 @@ possible_solves.each_with_index do |piece_array, index|
   end
 end
 possible_solves_master = pieces.permutation(pieces.length).to_a
+binding.pry
 solve_array_keys.each do |key|
   solutions.push(possible_solves_master[key])
 end
