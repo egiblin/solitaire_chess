@@ -141,7 +141,7 @@ def solution_checker(array)
         original_square = internal_board.find {|s| s.location == piece.location}
         blocker = piece.impedements?([(array[index + 1]).column, (array[index + 1]).row], internal_board)
         if blocker
-          captured_piece = pieces.find {|piece| piece.location == blocker.location}
+          captured_piece = array.find {|piece| piece.location == blocker.location}
           piece.move([blocker.column, blocker.row])
           array.uniq!{|piece| piece.location}
           new_arrays = array.permutation(array.length).to_a
@@ -183,7 +183,6 @@ possible_solves.each_with_index do |piece_array, index|
   end
 end
 possible_solves_master = pieces.permutation(pieces.length).to_a
-binding.pry
 solve_array_keys.each do |key|
   solutions.push(possible_solves_master[key])
 end

@@ -65,54 +65,54 @@ class Queen < Piece
         false
       end
     elsif (new_column - @column) > 0 && (new_row - @row) > 0
-      new_column = new_column + 1
-      new_row = new_row + 1
-      while new_column != @column || new_row != @row
-        square = board.find {|s| s.row == new_row and s.column == new_column}
+      path_column = @column + 1
+      path_row = @row + 1
+      while path_column != new_column || path_row != new_row
+        square = board.find {|s| s.row == path_row and s.column == path_column}
         if square.occupied
           return square
         else
-          new_column = new_column + 1
-          new_row = new_row + 1
+          path_column += 1
+          path_row += 1
         end
       end
       false
     elsif (new_column - @column) < 0 && (new_row - @row) > 0
-      new_column = new_column - 1
-      new_row = new_row + 1
-      while new_column != @column || new_row != @row
-        square = board.find {|s| s.row == new_row and s.column == new_column}
+      path_column = @column - 1
+      path_row = @row + 1
+      while path_column != new_column || path_row != new_row
+        square = board.find {|s| s.row == path_row and s.column == path_column}
         if square.occupied
           return square
         else
-          new_column = new_column - 1
-          new_row = new_row + 1
+          path_column -= 1
+          path_row += 1
         end
       end
       false
     elsif (new_column - @column) > 0 && (new_row - @row) < 0
-      new_column = new_column + 1
-      new_row = new_row - 1
-      while new_column != @column || new_row != @row
-        square = board.find {|s| s.row == new_row and s.column == new_column}
+      path_column = @column + 1
+      path_row = @row - 1
+      while path_column != new_column || path_row != new_row
+        square = board.find {|s| s.row == path_row and s.column == path_column}
         if square.occupied
           return square
         else
-          new_column = new_column + 1
-          new_row = new_row - 1
+          path_column += 1
+          path_row -= 1
         end
       end
       false
     elsif (new_column - @column) < 0 && (new_row - @row) < 0
-      new_column = new_column - 1
-      new_row = new_row - 1
-      while new_column != @column || new_row != @row
-        square = board.find {|s| s.row == new_row and s.column == new_column}
+      path_column = @column - 1
+      path_row = @row - 1
+      while path_column != new_column || path_row != new_row
+        square = board.find {|s| s.row == path_row and s.column == path_column}
         if square.occupied
           return square
         else
-          new_column = new_column - 1
-          new_row = new_row - 1
+          path_column -= 1
+          path_row -= 1
         end
       end
       false
