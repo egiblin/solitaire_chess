@@ -82,7 +82,7 @@ while board_input do
           pieces.push(Bishop.new([column, row]))
         elsif piece == "N"
           pieces.push(Knight.new([column, row]))
-        elsif piece == "Rook"
+        elsif piece == "R"
           pieces.push(Rook.new([column, row]))
         else
           pieces.push(Pawn.new([column, row]))
@@ -104,7 +104,7 @@ while board_input do
         pieces.push(Bishop.new([column, row]))
       elsif piece == "N"
         pieces.push(Knight.new([column, row]))
-      elsif piece == "Rook"
+      elsif piece == "R"
         pieces.push(Rook.new([column, row]))
       else
         pieces.push(Pawn.new([column, row]))
@@ -120,6 +120,7 @@ end
 #Method to check each permutation of move orders
 def solution_checker(array)
   if array.length > 1
+    # Create a board that can be manipulated without affecting the original board
     internal_board = []
     column_counter = 1
     row_counter = 1
@@ -131,34 +132,29 @@ def solution_checker(array)
       row_counter = row_counter + 1
       column_counter = 1
     end
+    #Label squares on the board as occupied
     array.each do |piece|
       square = internal_board.find {|s| s.location == piece.location}
       square.occupied = true
       square.piece = piece
     end
     array.each_with_index do |piece, index|
-      if piece != array.last && array.include?(piece)
+      if array.include?(piece) && piece != array.last
         original_square = internal_board.find {|s| s.location == piece.location}
         blocker = piece.impedements?([(array[index + 1]).column, (array[index + 1]).row], internal_board)
         if blocker
           captured_piece = array.find {|piece| piece.location == blocker.location}
           piece.move([blocker.column, blocker.row])
           array.uniq!{|piece| piece.location}
-          new_arrays = array.permutation(array.length).to_a
-          new_arrays.each do |new_array|
-            solution_checker(new_array)
-          end
           original_square.occupied = false
           original_square.piece = nil
+          solution_checker(array)
         elsif piece.move([(array[index + 1]).column, (array[index + 1]).row])
           captured_piece = array[index + 1]
           array.uniq!{|piece| piece.location}
-          new_arrays = array.permutation(array.length).to_a
-          new_arrays.each do |new_array|
-            solution_checker(new_array)
-          end
           original_square.occupied = false
           original_square.piece = nil
+          solution_checker(array)
         else
           break
         end
@@ -171,8 +167,12 @@ end
 #App checks whether or not the board is solvable
 possible_solves = pieces.permutation(pieces.length).to_a
 possible_solves.each do |piece_array|
+  piece_array.map! {|piece| piece.dup}
+end
+possible_solves.each do |piece_array|
   solution_checker(piece_array)
 end
+binding.pry
 solve_counter = 0
 solve_array_keys = []
 solutions = []
@@ -196,7 +196,7 @@ else
   puts "******************************"
   solutions.each do |solution|
     solution.each_with_index do |piece, index|
-      unless solution[-1] == piece
+      unless solution.last == piece
         puts "The #{solution.first.class} takes the #{solution[index + 1].class} at position #{solution[index + 1].location}."
       else
         puts "#{solution.first.class} is now the final piece."
