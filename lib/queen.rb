@@ -17,7 +17,7 @@ class Queen < Piece
     end
   end
 
-  def impedements?(location, board)
+  def impediments?(location, board)
     new_column = location[0]
     new_row = location[1]
     if new_column == @column
@@ -26,7 +26,7 @@ class Queen < Piece
         squares.sort! {|s| (s.row - @row).abs}
         squares.each do |square|
           if square.occupied
-            return square
+            return true
           end
         end
         false
@@ -35,7 +35,7 @@ class Queen < Piece
         squares.sort! {|s| (s.row - @row).abs}
         squares.each do |square|
           if square.occupied
-            return square
+            return true
           end
         end
         false
@@ -48,7 +48,7 @@ class Queen < Piece
         squares.sort! {|s| (s.column - @column).abs}
         squares.each do |square|
           if square.occupied
-            return square
+            return true
           end
         end
         false
@@ -57,7 +57,7 @@ class Queen < Piece
         squares.sort! {|s| (s.column - @column).abs}
         squares.each do |square|
           if square.occupied
-            return square
+            return true
           end
         end
         false
@@ -67,10 +67,10 @@ class Queen < Piece
     elsif (new_column - @column) > 0 && (new_row - @row) > 0
       path_column = @column + 1
       path_row = @row + 1
-      while path_column != new_column || path_row != new_row
+      while (path_column - new_column).abs > 1 || (path_row - new_row).abs > 1
         square = board.find {|s| s.row == path_row and s.column == path_column}
         if square.occupied
-          return square
+          return true
         else
           path_column += 1
           path_row += 1
@@ -80,10 +80,10 @@ class Queen < Piece
     elsif (new_column - @column) < 0 && (new_row - @row) > 0
       path_column = @column - 1
       path_row = @row + 1
-      while path_column != new_column || path_row != new_row
+      while (path_column - new_column).abs > 1 || (path_row - new_row).abs > 1
         square = board.find {|s| s.row == path_row and s.column == path_column}
         if square.occupied
-          return square
+          return true
         else
           path_column -= 1
           path_row += 1
@@ -93,10 +93,10 @@ class Queen < Piece
     elsif (new_column - @column) > 0 && (new_row - @row) < 0
       path_column = @column + 1
       path_row = @row - 1
-      while path_column != new_column || path_row != new_row
+      while (path_column - new_column).abs > 1 || (path_row - new_row).abs > 1
         square = board.find {|s| s.row == path_row and s.column == path_column}
         if square.occupied
-          return square
+          return true
         else
           path_column += 1
           path_row -= 1
@@ -106,10 +106,10 @@ class Queen < Piece
     elsif (new_column - @column) < 0 && (new_row - @row) < 0
       path_column = @column - 1
       path_row = @row - 1
-      while path_column != new_column || path_row != new_row
+      while (path_column - new_column).abs > 1 || (path_row - new_row).abs > 1
         square = board.find {|s| s.row == path_row and s.column == path_column}
         if square.occupied
-          return square
+          return true
         else
           path_column -= 1
           path_row -= 1

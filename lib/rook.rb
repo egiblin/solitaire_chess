@@ -13,7 +13,7 @@ class Rook < Piece
     end
   end
 
-  def impedements?(location, board)
+  def impediments?(location, board)
     new_column = location[0]
     new_row = location[1]
     if new_column == @column
@@ -22,7 +22,7 @@ class Rook < Piece
         squares.sort! {|s| (s.row - @row).abs}
         squares.each do |square|
           if square.occupied
-            return square
+            return true
           end
         end
         false
@@ -31,7 +31,7 @@ class Rook < Piece
         squares.sort! {|s| (s.row - @row).abs}
         squares.each do |square|
           if square.occupied
-            return square
+            return true
           end
         end
         false
@@ -44,7 +44,7 @@ class Rook < Piece
         squares.sort! {|s| (s.column - @column).abs}
         squares.each do |square|
           if square.occupied
-            return square
+            return true
           end
         end
         false
@@ -53,7 +53,7 @@ class Rook < Piece
         squares.sort! {|s| (s.column - @column).abs}
         squares.each do |square|
           if square.occupied
-            return square
+            return true
           end
         end
         false

@@ -7,7 +7,6 @@ require_relative 'piece'
 require_relative 'queen'
 require_relative 'rook'
 require_relative 'chess_board'
-require 'pry'
 
 #initialize boards
 board = []
@@ -141,23 +140,26 @@ def solution_checker(array)
     array.each_with_index do |piece, index|
       if array.include?(piece) && piece != array.last
         original_square = internal_board.find {|s| s.location == piece.location}
-        blocker = piece.impedements?([(array[index + 1]).column, (array[index + 1]).row], internal_board)
+        blocker = piece.impediments?([(array[index + 1]).column, (array[index + 1]).row], internal_board)
         if blocker
-          captured_piece = array.find {|piece| piece.location == blocker.location}
-          piece.move([blocker.column, blocker.row])
-          array.uniq!{|piece| piece.location}
-          original_square.occupied = false
-          original_square.piece = nil
-          solution_checker(array)
+          break
         elsif piece.move([(array[index + 1]).column, (array[index + 1]).row])
           captured_piece = array[index + 1]
           array.uniq!{|piece| piece.location}
           original_square.occupied = false
           original_square.piece = nil
-          solution_checker(array)
+          new_moves = array.permutation.to_a
+          new_moves.each do |new_array|
+            new_array.map {|a| a.dup}
+          end
+          new_moves.each do |new_array|
+            solution_checker(array)
+          end
         else
           break
         end
+      else
+        break
       end
     end
   end
@@ -172,7 +174,6 @@ end
 possible_solves.each do |piece_array|
   solution_checker(piece_array)
 end
-binding.pry
 solve_counter = 0
 solve_array_keys = []
 solutions = []
@@ -194,12 +195,14 @@ else
   puts "******************************"
   puts "There are #{solutions.length} solutions to this puzzle."
   puts "******************************"
-  solutions.each do |solution|
+  solutions.each_with_index do |solution, i|
+    puts "Solution #{i + 1}:"
     solution.each_with_index do |piece, index|
       unless solution.last == piece
         puts "The #{solution.first.class} takes the #{solution[index + 1].class} at position #{solution[index + 1].location}."
       else
         puts "#{solution.first.class} is now the final piece."
+        puts "****************************"
       end
     end
   end
